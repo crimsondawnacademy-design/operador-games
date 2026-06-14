@@ -1,0 +1,21 @@
+# Origem ISOLADA dos builds — Operador Games
+# Host separado da plataforma de membros (segurança: o jogo não enxerga
+# cookie/DOM da plataforma). Sem COOP/COEP porque os builds são single-thread.
+
+/*
+  Cross-Origin-Resource-Policy: cross-origin
+  Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff
+
+/*.wasm
+  Content-Type: application/wasm
+
+/*.pck
+  Content-Type: application/octet-stream
+
+/*.js
+  Content-Type: text/javascript
+
+# builds versionados podem cachear forte; o index fica curto pra permitir troca
+/*/index.html
+  Cache-Control: public, max-age=60
