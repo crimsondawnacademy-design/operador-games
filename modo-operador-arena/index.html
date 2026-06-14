@@ -4,6 +4,38 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>Modo Operador — Arena 60s</title>
+		<script>
+		/* Operador Games — destrava o áudio do Godot (autoplay policy).
+		   Captura todo AudioContext criado e dá resume() no 1º gesto do
+		   usuário (clique/tecla/touch dentro do jogo). Roda ANTES do index.js. */
+		(function () {
+			var AC = window.AudioContext || window.webkitAudioContext;
+			if (!AC) return;
+			var ctxs = [];
+			var Wrapped = new Proxy(AC, {
+				construct: function (Target, args) {
+					var c = new Target(args[0]);
+					try { ctxs.push(c); } catch (e) {}
+					return c;
+				}
+			});
+			window.AudioContext = Wrapped;
+			if (window.webkitAudioContext) window.webkitAudioContext = Wrapped;
+			function resumeAll() {
+				for (var i = 0; i < ctxs.length; i++) {
+					var c = ctxs[i];
+					if (c && c.state !== 'running' && typeof c.resume === 'function') {
+						c.resume().catch(function () {});
+					}
+				}
+			}
+			var evs = ['pointerdown', 'mousedown', 'touchstart', 'keydown', 'click'];
+			for (var j = 0; j < evs.length; j++) {
+				window.addEventListener(evs[j], resumeAll, { capture: true, passive: true });
+				document.addEventListener(evs[j], resumeAll, { capture: true, passive: true });
+			}
+		})();
+		</script>
 		<style>
 html, body, #canvas {
 	margin: 0;
